@@ -62,7 +62,10 @@ def on_message(mqttc, obj, msg):
         # and update locale cache
         print("Pushing to firebase")
         pushToDatabase(msg.payload)
-        print("Update local cache returned : ")
+        print("Update local cache ")
+        newWeather = msg.payload
+        newWeather=newWeather.decode("utf-8")
+        cashedData = ast.literal_eval(newWeather) 
 
 
 def on_publish(mqttc, obj, msg_id):

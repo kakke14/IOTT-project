@@ -31,7 +31,7 @@ class WeatherInfo(Resource):
         mqttc.publish("Update", "ForceUpdateReqFromAPI")
         mqttc.loop()
         while not messageReceived:
-            mqttc.loop()
+            sleep(1)
 
         messageReceived = False
         print(newWeather)
@@ -100,9 +100,8 @@ if __name__ == '__main__':
     
 
     # Continue the network loop, exit when an error occurs
-    mqttc.loop()
-    mqttc.loop()
-    mqttc.loop()
+    mqttc.loop_start()
+
     messageReceived=False
-    app.run(port='5002')
+    app.run(host='0.0.0.0', port='5002')
      

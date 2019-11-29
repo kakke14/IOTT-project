@@ -36,7 +36,7 @@ db = firebase.database()
 def on_message(mqttc, obj, msg):
   print("Message: " + msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
   if msg.topic=="ForcePoll":
-      data = getData(False)
+      data = getData(True)
 
       mqttc1.publish("FUpdateFromDevice",str(data));
       # check cashe if data is reason
@@ -163,7 +163,7 @@ if __name__== "__main__":
 
 
 
-  onTarget = False
+  onTarget = True
   x = Thread(target=continuesUpdate, args=(onTarget,))
   x.start()
   rc1 = 0
