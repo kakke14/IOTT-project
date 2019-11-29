@@ -29,7 +29,7 @@ localID=curUser['localId']
 print(str(localID))
 db = firebase.database()
 
-
+cashedData={"date":"2019-10-28 18:54:11.391745"}
 
 
 # Define event callbacks
@@ -37,14 +37,15 @@ def on_connect(mqttc, obj, flags, rc):
     print("flags, rc: " + str(flags) + " " + str(rc))
 
 def on_message(mqttc, obj, msg):
+    global cashedData
     print("Message: " + msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
     if msg.topic=="Update":
         print("checking chache....")
         # check cashe if data is reason
-        if False:
+        if ((datetime.datetime.now()-datetime.datetime.strptime(cashedData["date"], '%Y-%m-%d %H:%M:%S.%f')).total_seconds()<30):
             #send date from chache
             print("returning data from cache")
-            mqttc.publish("FUpdateFromDevice", "Cached data From Node")
+            mqttc.publish("FUpdateFromDevice", str(cashedData))
         else :
             # publish request of new data from Node
             print("Returning data collected from Node")
@@ -52,6 +53,9 @@ def on_message(mqttc, obj, msg):
 
     elif msg.topic=="FUpdateFromDevice":
             print("Updateing cache")
+            newWeather = msg.payload
+            newWeather=newWeather.decode("utf-8")
+            cashedData = ast.literal_eval(newWeather) 
 
     elif msg.topic=="ContinuesUpdate":
         #should just update firebase data base

@@ -1,9 +1,11 @@
 from flask import Flask, request
 from flask_restful import Resource, Api
-from json import dumps
+import json
 import paho.mqtt.client as paho, os, urllib.parse
 from time import sleep
 from threading import Thread
+
+import ast
 
 app = Flask(__name__)
 api = Api(app)
@@ -26,13 +28,14 @@ class WeatherInfo(Resource):
     def get(self):
         global messageReceived
         print("returning most resent data")
-        mqttc.publish("ForceUpdate", "ForceUpdateReqFromAPI")
+        mqttc.publish("Update", "ForceUpdateReqFromAPI")
         mqttc.loop()
         while not messageReceived:
             mqttc.loop()
 
+        messageReceived = False
         print(newWeather)
-        return {'asd':123}
+        return newWeather
         
 
 api.add_resource(WeatherInfo, '/weatherinfo') # Route_1
@@ -46,16 +49,17 @@ def on_connect(mqttc, obj, flags, rc):
     print("flags, rc: " + str(flags) + " " + str(rc))
 
 def on_message(mqttc, obj, msg):
-    global messageReceived
+    global messageReceived, newWeather
     print("Message: " + msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
-    if str(msg.payload)==str(b'ForceUpdateReqFromAPI'):
-        print("not right message")
-        return
-    else:
+    if msg.topic=="FUpdateFromDevice":
         print("that OK")
-        newWeather = {'asd':345}
+        newWeather = msg.payload
+        newWeather=newWeather.decode("utf-8")
+        newWeather = ast.literal_eval(newWeather) 
         messageReceived=True
         print(messageReceived)
+    else:
+        print("not the right topic")
 
 
 
@@ -91,7 +95,9 @@ if __name__ == '__main__':
     mqttc.connect("farmer.cloudmqtt.com", 14138)
 
     # Start subscribe, with QoS level 0
-    mqttc.subscribe("ForceUpdate", 0)
+    #mqttc.subscribe("ForceUpdate", 0)
+    mqttc.subscribe("FUpdateFromDevice", 0)
+    
 
     # Continue the network loop, exit when an error occurs
     mqttc.loop()
