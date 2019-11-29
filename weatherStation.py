@@ -124,7 +124,7 @@ def continuesUpdate(onTarget):
     data = getData(onTarget)
     print("publish on Continues update")
     mqttc2.publish("ContinuesUpdate", str(data))
-    sleep(5)
+    sleep(5*60)
 
 
 if __name__== "__main__":

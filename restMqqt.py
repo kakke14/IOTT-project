@@ -25,7 +25,7 @@ bootstrap = Bootstrap(app)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return {'asd':123}#render_template('index.html')
 
 
 @socketio.on('publish')

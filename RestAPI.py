@@ -20,10 +20,11 @@ def index():
     ret =  thr.start()
     return ret
 
-#messageReceived=False
+messageReceived=False
 newWeather={'asd':123}
 class WeatherInfo(Resource):
     def get(self):
+        global messageReceived
         print("returning most resent data")
         mqttc.publish("ForceUpdate", "ForceUpdateReqFromAPI")
         mqttc.loop()
@@ -45,6 +46,7 @@ def on_connect(mqttc, obj, flags, rc):
     print("flags, rc: " + str(flags) + " " + str(rc))
 
 def on_message(mqttc, obj, msg):
+    global messageReceived
     print("Message: " + msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
     if str(msg.payload)==str(b'ForceUpdateReqFromAPI'):
         print("not right message")
