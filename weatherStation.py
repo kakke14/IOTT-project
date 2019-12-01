@@ -171,6 +171,6 @@ if __name__== "__main__":
   print("setup done")
   while rc1 == 0 & rc2 == 0:
       rc1 = mqttc1.loop()
-      rc12 = mqttc1.loop()
+      rc2 = mqttc2.loop()
   print("rc1: " + str(rc1) + "rc2: " + str(rc2))
   
